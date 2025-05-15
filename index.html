@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Случайный кот</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .cat-image {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 15px;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    .cat-image.loaded {
+      opacity: 1;
+    }
+
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Посмотри на котика!</h1>
+    <div class="spinner" id="spinner"></div>
+    <img class="cat-image" id="catImage" src="" alt="Кот" />
+    <button id="catButton">Показать кота</button>
+  </div>
+
+  <script>
+    const button = document.getElementById('catButton');
+    const image = document.getElementById('catImage');
+    const spinner = document.getElementById('spinner');
+
+    button.addEventListener('click', async () => {
+      // Скрыть изображение
+      image.classList.remove('loaded');
+      image.style.display = 'none';
+      // Показать спиннер
+      spinner.style.display = 'block';
+      
+      try {
+        const response = await fetch('https://api.thecatapi.com/v1/images/search ');
+        const data = await response.json();
+        const catUrl = data[0].url;
+        
+        // Обновить src изображения
+        image.src = catUrl;
+        
+        // Подождать, пока изображение загрузится
+        await new Promise(resolve => {
+          image.onload = resolve;
+          image.style.display = 'block';
+        });
+        
+        // Показать изображение
+        image.classList.add('loaded');
+      } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        alert('Не удалось загрузить кота. Попробуйте еще раз.');
+      } finally {
+        // Скрыть спиннер
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
